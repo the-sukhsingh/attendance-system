@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import AttendanceDialog from "@/app/compoents/AttendanceDialog";
 import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function ClassPage() {
+  const router = useRouter();
   const [classData, setClassData] = useState(null);
   const [showAttendanceDialog, setShowAttendanceDialog] = useState(false);
   const { id } = useParams();
@@ -25,8 +27,12 @@ export default function ClassPage() {
   const getClass = async () => {
     const res = await fetch(`/api/classes/${id}`);
     const data = await res.json();
-    console.log("data", data);
-    setClassData(data);
+    if(data.error){
+      window.alert("Class not found");
+      router.push("/");
+    }else{
+      setClassData(data);
+    }
   };
 
   useEffect(() => {
