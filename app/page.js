@@ -7,22 +7,22 @@ export default function Home() {
   const [showAddClass, setShowAddClass] = useState(false);
   const [newClass, setNewClass] = useState("");
   const router = useRouter();
-  const localuser = localStorage.getItem("currentUser") || null;
-
+  
   const getClasses = async () => {
     fetch("/api/getClasses")
-      .then((res) => res.json())
-      .catch((err) => console.log(err))
-      .then((data) => {
-        setClasses(data.classes);
-        localStorage.setItem("classes", JSON.stringify(data.classes));
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    .then((res) => res.json())
+    .catch((err) => console.log(err))
+    .then((data) => {
+      setClasses(data.classes);
+      localStorage.setItem("classes", JSON.stringify(data.classes));
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   };
-
+  
   useEffect(() => {
+    const localuser = localStorage.getItem("currentUser") || null;
     // Check if user exists and parse only if it does
     if (localuser === null) {
       router.push("/auth");
