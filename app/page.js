@@ -1,101 +1,123 @@
-import Image from "next/image";
+"use client"
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [classes, setClasses] = useState([]);
+  const [showAddClass, setShowAddClass] = useState(false);
+  const [newClass, setNewClass] = useState("");
+  const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+
+  const getClasses =async () => {
+    fetch('/api/getClasses').then(res => res.json()).catch(err=>console.log(err)).then(data => {
+      setClasses(data.classes);
+      localStorage.setItem('classes', JSON.stringify(data.classes));
+    }).catch(err => {
+      console.log(err);
+    })
+  }
+
+  useEffect(() => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+      router.push('/auth');
+    } else if (currentUser.role !== 'teacher') {
+      router.push('/student-dashboard');
+    }
+    getClasses();
+    setClasses(JSON.parse(localStorage.getItem('classes') || '[]'));
+  }, []);
+
+  const handleAddClass = () => {
+    fetch('/api/createClass', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newClass),
+    }).then(res => res.json()).then(data => {
+      setClasses([...classes, data.class]);
+      localStorage.setItem('classes', JSON.stringify([...classes, data.class]));
+      setShowAddClass(false);
+    });
+  };
+
+  return (
+    <div className="p-8 ">
+      <h1 className="text-3xl mb-8">Classes</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {classes && classes.length > 0 && classes.map(cls => (
+          <div
+            key={cls?._id}
+            className="bg-white p-4 rounded-lg shadow cursor-pointer text-black w-full flex justify-between"
+            onClick={() => router.push(`/class/${cls?._id}`)}
+            >
+            <h2 className="text-xl">{cls?.name || 'Untitled Class'}</h2>
+            <button
+              className="bg-red-500 text-white p-2 rounded"
+              onClick={
+                (e) => {
+                  e.stopPropagation();
+                  const confirmDelete = confirm('Are you sure you want to delete this class?');
+                  if (confirmDelete) {
+                  fetch(`/api/deleteClass/${cls._id}`,{
+                    method: 'DELETE',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  })
+                  .then(res => res.json())
+                  .then(data => {
+                    setClasses(classes.filter(c => c._id !== cls._id));
+                    localStorage.setItem('classes', JSON.stringify(classes.filter(c => c._id !== cls._id)));
+                  })} else {
+                    return;
+                  }
+                }
+              }
+            >
+              Delete
+            </button>
+          </div>
+        ))}
+      </div>
+      
+        <button
+          className="bg-blue-500 text-white p-4 rounded-lg mt-4"
+          onClick={() => setShowAddClass(true)}
+        >
+          Add a Class
+        </button>
+
+      {showAddClass && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white text-black p-8 rounded-lg">
+            <h2 className="text-2xl mb-4">Add New Class</h2>
+            <input
+              type="text"
+              placeholder="Subject Name"
+              className="w-full mb-4 p-2 border rounded"
+              value={newClass.subject}
+              onChange={(e) => setNewClass(e.target.value)}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <div className="flex justify-end gap-2">
+              <button
+                className="bg-gray-500 text-white p-2 rounded"
+                onClick={() => setShowAddClass(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-blue-500 text-white p-2 rounded"
+                onClick={handleAddClass}
+              >
+                Add Class
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      )}
     </div>
   );
 }
