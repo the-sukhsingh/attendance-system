@@ -19,3 +19,13 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.dates-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  background: linear-gradient(to right, transparent);
+}
+.dates-scroll::-webkit-scrollbar {
+  display: none;
+}
+

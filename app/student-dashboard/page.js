@@ -35,21 +35,21 @@ export default function StudentDashboard() {
   return (
     <div className="p-8">
       <h1 className="text-3xl mb-8">My Attendance</h1>
-      <div className="overflow-x-auto max-w-screen-lg">
+      <div className="overflow-x-auto max-w-screen">
         <table className="w-full">
-          <thead className="sticky top-0">
+          <thead className="relative top-0">
             <tr>
               <th className="text-left p-2 min-w-[120px] sticky left-0 z-10">Subject</th>
-              <th className="text-left p-2 min-w-[200px] sticky left-[120px] z-10">Dates</th>
-              <th className="text-left p-2 sticky right-0 z-10">Attendance %</th>
+              <th className="text-left p-2 min-w-[200px] absolute left-[200px] z-10">Dates</th>
+              <th className="text-left p-2 min-w-[150px] sticky right-0 z-10">Attendance %</th>
             </tr>
           </thead>
           <tbody>
             {classes && classes.map(cls => (
               <tr key={cls._id}>
-                <td className="p-2 min-w-[120px] sticky left-0">{cls.name}</td>
-                <td className="p-2 min-w-[200px]">
-                  <div className="flex gap-2 overflow-x-auto pb-2">
+                <td className="p-2 min-w-[120px] sticky text-black left-0 bg-white">{cls.name}</td>
+                <td className="p-2  overflow-x-auto  min-w-[200px]">
+                  <div className="flex gap-2 pb-2">
                     {cls && cls.attendance.map((attendd, index) => (
                       <div key={index} className="flex flex-col items-center min-w-[80px] border rounded p-1">
                         <div className="text-sm">{new Date(attendd.date).toLocaleDateString()}</div>
@@ -68,7 +68,7 @@ export default function StudentDashboard() {
                     ))}
                   </div>
                 </td>
-                <td className="p-2 sticky right-0">
+                <td className="p-2 sticky right-0 text-black bg-white">
                   {calculateStudentAttendance(studentData._id, cls.attendance)}%
                 </td>
               </tr>

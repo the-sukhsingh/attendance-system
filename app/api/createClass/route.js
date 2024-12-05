@@ -8,7 +8,6 @@ export async function POST(request) {
     await connectToDatabase();
     await validUser(request);
     const user = request.user;
-    console.log("user is ",user);
     if (!user || user.role !== "teacher") {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -26,6 +25,8 @@ export async function POST(request) {
     teacher.classes.push(newClass._id);
     await teacher.save();
 
-    return NextResponse.json({ message: "Class created successfully" }, { status: 201 },{class:newClass});
+    return NextResponse.json(
+        {message: "Class created successfully", class: newClass,status:201}
+    );
 
 }

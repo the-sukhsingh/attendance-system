@@ -11,6 +11,13 @@ export default function ClassPage() {
   const { id } = useParams();
   const [students, setStudents] = useState([]);
 
+  useEffect(() => {
+    if (classData) {
+        document.title = classData.name;
+    }
+}, [classData])
+
+
   const getStudents = async () => {
     const res = await fetch(`/api/students`, {
       method: "POST",
@@ -20,17 +27,16 @@ export default function ClassPage() {
       body: JSON.stringify(classData.students),
     });
     const data = await res.json();
-    console.log(data);
     setStudents(data);
   };
 
   const getClass = async () => {
     const res = await fetch(`/api/classes/${id}`);
     const data = await res.json();
-    if(data.error){
+    if (data.error) {
       window.alert("Class not found");
       router.push("/");
-    }else{
+    } else {
       setClassData(data);
     }
   };
@@ -61,7 +67,6 @@ export default function ClassPage() {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setClassData(data.class);
         setShowAttendanceDialog(false);
       });
@@ -72,33 +77,35 @@ export default function ClassPage() {
   const [newStudent, setNewStudent] = useState({ name: "", rollNo: "" });
 
   const handleAddStudent = async () => {
-    try {
-      const res = await fetch(`/api/addStudentToClass`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          studentRoll: newStudent.rollNo,
-          classId: id,
-          studentName: newStudent.name
-        }),
-      });
+    const res = await fetch(`/api/addStudentToClass`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        studentRoll: newStudent.rollNo,
+        classId: id,
+        studentName: newStudent.name,
+      }),
+    });
 
-      if (!res.ok) {
-        throw new Error('Failed to add student');
-      }
-
-      const data = await res.json();
-      
-      if (data.status === 201) {
-        setClassData(data.class);
-        setNewStudent({ name: "", rollNo: "" });
-        setShowAddStudentDialog(false);
-      }
-    } catch (error) {
-      console.error('Error adding student:', error);
+    if (!res.ok) {
+      throw new Error("Failed to add student");
     }
+
+    const data = await res.json();
+
+    if (data.error) {
+      setNewStudent({ name: "", rollNo: "" });
+      setShowAddStudentDialog(false);
+      return alert(data.error);
+    }
+    setClassData(data.class);
+    setStudents(data.class.students);
+    setNewStudent({ name: "", rollNo: "" });
+    setShowAddStudentDialog(false);
+    alert(data.message);
+    return;
   };
 
   if (!classData) return <div>Loading...</div>;
@@ -130,8 +137,9 @@ export default function ClassPage() {
               placeholder="Student Name"
               className="border p-2 mb-2 w-full"
               value={newStudent.name}
+              autoFocus
               onChange={(e) =>
-                setNewStudent({ ...newStudent, name: e.target.value })
+                setNewStudent({ ...newStudent, name: e.target.value })``
               }
             />
             <input
@@ -151,8 +159,13 @@ export default function ClassPage() {
                 Cancel
               </button>
               <button
-                className="bg-green-500 text-white p-2 rounded"
+                className="bg-green-500 text-white p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={handleAddStudent}
+                disabled={
+                  !newStudent.name ||
+                  !newStudent.rollNo ||
+                  newStudent.name.length < 3
+                }
               >
                 Add
               </button>
@@ -164,22 +177,26 @@ export default function ClassPage() {
         <table>
           <thead>
             <tr className="border">
-              <th className="text-left p-2 w-24">Roll No</th>
-              <th className="text-left p-2 w-40">Name</th>
+              <th className="text-left p-2 text-nowrap">Roll No</th>
+              <th className="text-left p-2 text-nowrap">Name</th>
             </tr>
           </thead>
           <tbody>
             {students &&
-              students.map((student) => (
-                <tr key={student._id} className="border">
-                  <td className="p-2 w-24">{student.rollNo}</td>
-                  <td className="p-2 w-40">{student.name}</td>
+              students.map((student, index) => (
+                <tr key={student._id || index}
+                  className={`border ${
+                    index % 2 === 0 ? "bg-gray-600" : "bg-black"
+                  }`}
+                >
+                  <td className="p-2 w-32">{student.rollNo}</td>
+                  <td className="p-2 text-nowrap">{student.name}</td>
                 </tr>
               ))}
           </tbody>
         </table>
-        <div className="overflow-x-auto">
-          <table className="table-fixed">
+        <div className="overflow-x-auto dates-scroll">
+          <table className="table-fixed vignete-right">
             <thead>
               <tr className="border">
                 {classData.attendance?.map((att) => (
@@ -194,29 +211,43 @@ export default function ClassPage() {
             </thead>
             <tbody className="border">
               {students.map((student, idx) => (
-                <tr key={student.rollNo} className="border">
+                <tr key={student._id || idx} className="border">
                   {classData.attendance?.map((att) => (
                     <td
                       key={`${student.rollNo}-${att.date}`}
-                      className="p-2 w-24 text-center"
+                      className={ 
+                        `p-2 text-center ${
+                          idx % 2 === 0 ? "bg-gray-600" : "bg-black"
+                        }`
+                      }
                     >
-                      {att.attended && att.attended[idx].present === true
-                        ? "✓"
-                        : "✗"}
+                      {att.attended && Array.isArray(att.attended) && (
+                        <span
+                          className={`rounded-full h-6 w-6 inline-block ${
+                            att.attended[idx]?.present === true
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                          }`}
+                        ></span>
+                      )}
                     </td>
                   ))}
                 </tr>
               ))}
-            </tbody>
-          </table>{" "}
-        </div>
 
+            </tbody>
+          </table>
+        </div>
         <table className="m-0 border">
           <thead>
             <tr>
-              <th className="text-left p-2 w-32 border">Total Classes</th>
-              <th className="text-left p-2 w-40 border">Classes Attended</th>
-              <th className="text-left p-2 w-32 border">Attendance %</th>
+              <th className="text-left p-2 text-nowrap border">
+                Total Classes
+              </th>
+              <th className="text-left p-2 text-nowrap border">
+                Classes Attended
+              </th>
+              <th className="text-left p-2 text-nowrap border">Attendance %</th>
             </tr>
           </thead>
           <tbody>
@@ -231,7 +262,11 @@ export default function ClassPage() {
                 : 0;
 
               return (
-                <tr key={student.rollNo} className="border">
+                <tr key={student.rollNo || idx}
+                  className={`border ${
+                    idx % 2 === 0 ? "bg-gray-600" : "bg-black"
+                  }`} 
+                >
                   <td className="p-2 w-28 text-center border">
                     {totalClasses}
                   </td>
@@ -256,11 +291,11 @@ export default function ClassPage() {
   );
 }
 
-function calculateAttendance(rollNo, attendance) {
-  if (!attendance || attendance.length === 0) return 0;
-  const totalDays = attendance.length;
-  const presentDays = attendance.reduce((acc, day) => {
-    return acc + (day.data[rollNo] === "present" ? 1 : 0);
-  }, 0);
-  return Math.round((presentDays / totalDays) * 100);
-}
+// function calculateAttendance(rollNo, attendance) {
+//   if (!attendance || attendance.length === 0) return 0;
+//   const totalDays = attendance.length;
+//   const presentDays = attendance.reduce((acc, day) => {
+//     return acc + (day.data[rollNo] === "present" ? 1 : 0);
+//   }, 0);
+//   return Math.round((presentDays / totalDays) * 100);
+// }

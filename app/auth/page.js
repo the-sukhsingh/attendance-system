@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
-  const { login, register } = useAuth();
+  const { login, register,authLoading } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,6 +19,7 @@ export default function Auth() {
       login(formData);
     } else {
       register(formData);
+      setIsLogin(true);
     }
   };
 
@@ -73,9 +74,10 @@ export default function Auth() {
           )}
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded"
+            className="w-full bg-blue-500 text-white p-2 rounded disabled:opacity-50"
+            disabled={authLoading}
           >
-            {isLogin ? 'Login' : 'Sign Up'}
+            {!authLoading ? isLogin ? 'Login' : 'Sign Up' : 'Loading...'}
           </button>
         </form>
         <button

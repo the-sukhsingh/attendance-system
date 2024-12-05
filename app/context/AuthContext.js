@@ -63,6 +63,7 @@ export function AuthProvider({ children }) {
         alert(data.error)
         return false
       }
+      alert(data.message + " Please login to continue.")
     } catch (error) {
       console.error('Registration error:', error)
       return false
@@ -74,6 +75,9 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null)
     localStorage.removeItem('currentUser')
+    localStorage.removeItem('classes')
+    document.cookie = `token=; expires=${Date.now}; path=/`;
+    window.location.href = '/auth'
   }
 
   return (

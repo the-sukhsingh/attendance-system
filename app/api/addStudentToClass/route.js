@@ -19,13 +19,13 @@ export async function POST(request) {
     const student = await Student.findOne({ rollNo: studentRoll });
     console.log("student ",student);
     if (!student) {
-        return NextResponse.json({ message: "Student not found" });
+        return NextResponse.json({ error: "Student not found" });
     }
 
     const classObj = await Class.findById(classId);
     console.log("classObj ",classObj);
     if (!classObj) {
-        return NextResponse.json({ message: "Class not found" });
+        return NextResponse.json({ error: "Class not found" });
     }
 
     classObj.students.push(student._id);
@@ -33,5 +33,8 @@ export async function POST(request) {
 
     student.classes.push(classId);
     await student.save();
-    return NextResponse.json({ message: "Student added to class" },{status:201},{class:classObj});
+    return NextResponse.json({ message: "Student added to class",
+        status:201,
+        class:classObj
+    });
 }
