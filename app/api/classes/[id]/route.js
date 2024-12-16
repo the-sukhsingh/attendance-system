@@ -14,7 +14,6 @@ export async function GET(request,{params}) {
     const slug = (await params).id  
     try{
         const cls = await Class.findById(slug);
-        console.log("class is ",cls);
         return NextResponse.json(cls);
     }
     catch(e){

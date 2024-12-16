@@ -3,21 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: theme('colors.light.bg');
+  --card-background: theme('colors.light.card');
+  --border-color: theme('colors.light.border');
+  --text-primary: theme('colors.gray.900');
+  --text-secondary: theme('colors.gray.600');
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --background: theme('colors.dark.bg');
+  --card-background: theme('colors.dark.card');
+  --border-color: theme('colors.dark.border');
+  --text-primary: theme('colors.gray.100');
+  --text-secondary: theme('colors.gray.400');
 }
 
 body {
-  color: var(--foreground);
+  color: var(--text-primary);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease;
 }
 
 .dates-scroll {
@@ -29,3 +34,64 @@ body {
   display: none;
 }
 
+.card {
+  @apply bg-[var(--card-background)] border border-[var(--border-color)] rounded-lg shadow-sm transition-all duration-200;
+}
+
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+.btn-primary {
+  @apply btn bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700;
+}
+
+.btn-secondary {
+  @apply btn bg-gray-500 text-white hover:bg-gray-600 active:bg-gray-700;
+}
+
+.input {
+  @apply w-full px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--card-background)] 
+  text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all duration-200;
+}
+
+.table-container {
+  @apply rounded-lg border border-[var(--border-color)] overflow-hidden;
+}
+
+.table-header {
+  @apply bg-[var(--card-background)] text-[var(--text-primary)] font-medium;
+}
+
+.table-row {
+  @apply border-t border-[var(--border-color)] transition-colors duration-200;
+}
+
+.table-cell {
+  @apply px-4 py-2;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--card-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.dates-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  background: linear-gradient(to right, transparent);
+}

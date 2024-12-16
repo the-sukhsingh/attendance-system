@@ -14,16 +14,12 @@ export async function POST(request) {
     }
 
     const { studentRoll, classId } = await request.json();
-    console.log("studentRoll ",studentRoll);
-    console.log("classId ",classId);
     const student = await Student.findOne({ rollNo: studentRoll });
-    console.log("student ",student);
     if (!student) {
         return NextResponse.json({ error: "Student not found" });
     }
 
     const classObj = await Class.findById(classId);
-    console.log("classObj ",classObj);
     if (!classObj) {
         return NextResponse.json({ error: "Class not found" });
     }

@@ -16,7 +16,6 @@ export async function DELETE(request,{params}) {
         return NextResponse.json({ message: "Teacher not found" }, { status: 404 });
     }
     const classId = (await params).id  
-    console.log("classId is ",classId);
     const cls = await Class.findById(classId);
     if (!cls) {
         return NextResponse.json({ message: "Class not found" }, { status: 404 });

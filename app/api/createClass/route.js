@@ -12,7 +12,6 @@ export async function POST(request) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const name = await request.json();
-    console.log("name is ",name);
     const newClass = new Class({
         name,
         teacher: request.user._id,

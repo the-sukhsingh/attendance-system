@@ -1,8 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import AttendanceDialog from "@/app/compoents/AttendanceDialog";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 export default function ClassPage() {
   const router = useRouter();
@@ -13,10 +12,9 @@ export default function ClassPage() {
 
   useEffect(() => {
     if (classData) {
-        document.title = classData.name;
+      document.title = classData.name;
     }
-}, [classData])
-
+  }, [classData]);
 
   const getStudents = async () => {
     const res = await fetch(`/api/students`, {
@@ -108,194 +106,270 @@ export default function ClassPage() {
     return;
   };
 
-  if (!classData) return <div>Loading...</div>;
+  if (!classData)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl mb-8">{classData.subject}</h1>
-      <button
-        className="bg-blue-500 text-white p-4 rounded-lg mb-8"
-        onClick={() => setShowAttendanceDialog(true)}
-      >
-        Take Attendance
-      </button>
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 p-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="mb-10">
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            {classData.name}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Class Management Dashboard
+          </p>
+        </div>
 
-      <button
-        className="bg-green-500 text-white p-4 rounded-lg mb-8 ml-4"
-        onClick={() => setShowAddStudentDialog(true)}
-      >
-        Add Student
-      </button>
+        {/* Action Buttons */}
+        <div className="flex gap-4 mb-8">
+          <button
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-all duration-200 flex items-center gap-2"
+            onClick={() => setShowAttendanceDialog(true)}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            Take Attendance
+          </button>
+          <button
+            className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-medium transition-all duration-200 flex items-center gap-2"
+            onClick={() => setShowAddStudentDialog(true)}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Add Student
+          </button>
+        </div>
 
-      {/* Add Student Dialog */}
-      {showAddStudentDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg text-black">
-            <h2 className="text-xl mb-4">Add New Student</h2>
-            <input
-              type="text"
-              placeholder="Student Name"
-              className="border p-2 mb-2 w-full"
-              value={newStudent.name}
-              autoFocus
-              onChange={(e) =>
-                setNewStudent({ ...newStudent, name: e.target.value })``
-              }
-            />
-            <input
-              type="text"
-              placeholder="Roll Number"
-              className="border p-2 mb-4 w-full"
-              value={newStudent.rollNo}
-              onChange={(e) =>
-                setNewStudent({ ...newStudent, rollNo: e.target.value })
-              }
-            />
-            <div className="flex justify-end gap-2">
-              <button
-                className="bg-gray-500 text-white p-2 rounded"
-                onClick={() => setShowAddStudentDialog(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-green-500 text-white p-2 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={handleAddStudent}
-                disabled={
-                  !newStudent.name ||
-                  !newStudent.rollNo ||
-                  newStudent.name.length < 3
-                }
-              >
-                Add
-              </button>
+        {/* Main Content */}
+        <div className="bg-gray-800 rounded-xl shadow-xl overflow-hidden">
+          <div className="flex">
+            {/* Student Info Table */}
+            <table className="border-r border-gray-200 dark:border-gray-700">
+              <thead>
+                <tr>
+                  <th className="bg-gray-100 dark:bg-gray-900 text-left p-4 text-gray-600 dark:text-gray-400 font-medium">
+                    Roll No
+                  </th>
+                  <th className="bg-gray-100 dark:bg-gray-900 text-left p-4 text-gray-600 dark:text-gray-400 font-medium">
+                    Name
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((student, index) => (
+                  <tr
+                    key={student._id || index}
+                    className={`border-b border-gray-200 dark:border-gray-700 ${
+                      index % 2 === 0
+                        ? "bg-white dark:bg-gray-800"
+                        : "bg-gray-50 dark:bg-gray-700"
+                    }`}
+                  >
+                    <td className="p-4 text-gray-700 dark:text-gray-300">
+                      {student.rollNo}
+                    </td>
+                    <td className="p-4 text-gray-700 dark:text-gray-300">
+                      {student.name}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Attendance Dates */}
+            <div className="overflow-x-auto flex-1">
+              <table className="border-r border-gray-200 dark:border-gray-700 w-full">
+                <thead>
+                  <tr>
+                    {classData.attendance?.map((att) => (
+                      <th
+                        key={att.date}
+                        className="bg-gray-100 dark:bg-gray-900 text-left p-4 text-gray-600 dark:text-gray-400 font-medium"
+                      >
+                        {new Date(att.date).toLocaleDateString()}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {students.map((student, idx) => (
+                    <tr
+                      key={student._id || idx}
+                      className={`border-b border-gray-200 dark:border-gray-700 ${
+                        idx % 2 === 0
+                          ? "bg-white dark:bg-gray-800"
+                          : "bg-gray-50 dark:bg-gray-700"
+                      }`}
+                    >
+                      {classData.attendance?.map((att) => (
+                        <td
+                          key={`${student.rollNo}-${att.date}`}
+                          className="p-4 text-gray-700 dark:text-gray-300"
+                        >
+                          {att.attended && Array.isArray(att.attended) && (
+                            <span
+                              className={`inline-flex items-center justify-center h-8 w-8 rounded-full ${
+                                att.attended[idx]?.present
+                                  ? "bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-500"
+                                  : "bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-500"
+                              }`}
+                            >
+                              {att.attended[idx]?.present ? "✓" : "✕"}
+                            </span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+
+            {/* Statistics */}
+            <table className="border-r border-gray-200 dark:border-gray-700">
+              <thead>
+                <tr>
+                  <th className="bg-gray-100 dark:bg-gray-900 text-left p-4 text-gray-600 dark:text-gray-400 font-medium">
+                    Total
+                  </th>
+                  <th className="bg-gray-100 dark:bg-gray-900 text-left p-4 text-gray-600 dark:text-gray-400 font-medium">
+                    Attended
+                  </th>
+                  <th className="bg-gray-100 dark:bg-gray-900 text-left p-4 text-gray-600 dark:text-gray-400 font-medium">
+                    %
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((student, idx) => {
+                  const totalClasses = classData.attendance?.length || 0;
+                  const attendedClasses =
+                    classData.attendance?.reduce(
+                      (acc, day) =>
+                        acc + (day.attended[idx].present === true ? 1 : 0),
+                      0
+                    ) || 0;
+                  const percentage = totalClasses
+                    ? Math.round((attendedClasses / totalClasses) * 100)
+                    : 0;
+                  return (
+                    <tr
+                      key={student.rollNo || idx}
+                      className={`border-b border-gray-200 dark:border-gray-700 ${
+                        idx % 2 === 0
+                          ? "bg-white dark:bg-gray-800"
+                          : "bg-gray-50 dark:bg-gray-700"
+                      }`}
+                    >
+                      <td className="p-4 text-gray-700 dark:text-gray-300 text-center">
+                        {totalClasses}
+                      </td>
+                      <td className="p-4 text-gray-700 dark:text-gray-300 text-center">
+                        {attendedClasses}
+                      </td>
+                      <td className="p-4 text-center">
+                        <span
+                          className={`px-2 py-1 rounded ${
+                            percentage >= 75
+                              ? "bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-500"
+                              : percentage >= 60
+                              ? "bg-yellow-100 dark:bg-yellow-500/20 text-yellow-600 dark:text-yellow-500"
+                              : "bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-500"
+                          }`}
+                        >
+                          {percentage}%
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
-      )}
-      <div className="flex">
-        <table>
-          <thead>
-            <tr className="border">
-              <th className="text-left p-2 text-nowrap">Roll No</th>
-              <th className="text-left p-2 text-nowrap">Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students &&
-              students.map((student, index) => (
-                <tr key={student._id || index}
-                  className={`border ${
-                    index % 2 === 0 ? "bg-gray-600" : "bg-black"
-                  }`}
-                >
-                  <td className="p-2 w-32">{student.rollNo}</td>
-                  <td className="p-2 text-nowrap">{student.name}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-        <div className="overflow-x-auto dates-scroll">
-          <table className="table-fixed vignete-right">
-            <thead>
-              <tr className="border">
-                {classData.attendance?.map((att) => (
-                  <th
-                    key={att.date}
-                    className="text-left p-2 w-24 whitespace-nowrap"
-                  >
-                    {new Date(att.date).toLocaleDateString()}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="border">
-              {students.map((student, idx) => (
-                <tr key={student._id || idx} className="border">
-                  {classData.attendance?.map((att) => (
-                    <td
-                      key={`${student.rollNo}-${att.date}`}
-                      className={ 
-                        `p-2 text-center ${
-                          idx % 2 === 0 ? "bg-gray-600" : "bg-black"
-                        }`
-                      }
-                    >
-                      {att.attended && Array.isArray(att.attended) && (
-                        <span
-                          className={`rounded-full h-6 w-6 inline-block ${
-                            att.attended[idx]?.present === true
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                          }`}
-                        ></span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
 
-            </tbody>
-          </table>
-        </div>
-        <table className="m-0 border">
-          <thead>
-            <tr>
-              <th className="text-left p-2 text-nowrap border">
-                Total Classes
-              </th>
-              <th className="text-left p-2 text-nowrap border">
-                Classes Attended
-              </th>
-              <th className="text-left p-2 text-nowrap border">Attendance %</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((student, idx) => {
-              const totalClasses = classData.attendance?.length || 0;
-              const attendedClasses =
-                classData.attendance?.reduce((acc, day) => {
-                  return acc + (day.attended[idx].present === true ? 1 : 0);
-                }, 0) || 0;
-              const percentage = totalClasses
-                ? Math.round((attendedClasses / totalClasses) * 100)
-                : 0;
-
-              return (
-                <tr key={student.rollNo || idx}
-                  className={`border ${
-                    idx % 2 === 0 ? "bg-gray-600" : "bg-black"
-                  }`} 
+        {/* Dialogs */}
+        {showAddStudentDialog && (
+          <div className="fixed inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center">
+            <div className="card p-6 w-96 max-w-[90vw]">
+              <h2 className="text-xl font-semibold mb-4">Add New Student</h2>
+              <input
+                type="text"
+                className="input mb-3"
+                placeholder="Student Name"
+                value={newStudent.name}
+                onChange={(e) =>
+                  setNewStudent({ ...newStudent, name: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                className="input mb-4"
+                placeholder="Roll Number"
+                value={newStudent.rollNo}
+                onChange={(e) =>
+                  setNewStudent({ ...newStudent, rollNo: e.target.value })
+                }
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  className="btn-secondary"
+                  onClick={() => setShowAddStudentDialog(false)}
                 >
-                  <td className="p-2 w-28 text-center border">
-                    {totalClasses}
-                  </td>
-                  <td className="p-2 w-32 text-center border">
-                    {attendedClasses}
-                  </td>
-                  <td className="p-2 w-28 text-center border">{percentage}%</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  Cancel
+                </button>
+                <button
+                  className="btn-primary"
+                  onClick={handleAddStudent}
+                  disabled={
+                    !newStudent.name ||
+                    !newStudent.rollNo ||
+                    newStudent.name.length < 3
+                  }
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showAttendanceDialog && (
+          <AttendanceDialog
+            students={students}
+            onClose={() => setShowAttendanceDialog(false)}
+            onSubmit={handleAttendanceSubmit}
+          />
+        )}
       </div>
-      {showAttendanceDialog && (
-        <AttendanceDialog
-          students={students}
-          onClose={() => setShowAttendanceDialog(false)}
-          onSubmit={handleAttendanceSubmit}
-        />
-      )}
     </div>
   );
 }
-
-// function calculateAttendance(rollNo, attendance) {
-//   if (!attendance || attendance.length === 0) return 0;
-//   const totalDays = attendance.length;
-//   const presentDays = attendance.reduce((acc, day) => {
-//     return acc + (day.data[rollNo] === "present" ? 1 : 0);
-//   }, 0);
-//   return Math.round((presentDays / totalDays) * 100);
-// }

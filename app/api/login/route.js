@@ -8,12 +8,10 @@ import bcrypt from "bcrypt";
 export async function POST(request) {
     await connectToDatabase();
     const { email, password } = await request.json();
-    console.log("email and password is ", email, password);
     const user = await Teacher.findOne({ email }) || await Student.findOne({ email }) || null;
     if (!user) {
         return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
-    console.log("user is ", user);
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
         return NextResponse.json({ message: "Invalid password" }, { status: 400 });

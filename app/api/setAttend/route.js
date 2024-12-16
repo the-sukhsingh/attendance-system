@@ -12,7 +12,6 @@ export async function POST(request) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
   const { classId, presentArray,studentArray } = await request.json();
-  console.log("presentArray", presentArray);
   const classData = await Class.findById(classId);
 
   if (!classData) {
@@ -30,7 +29,6 @@ export async function POST(request) {
       studentId: studentArray[i]._id,
       present: isPresent,
     });
-    console.log("attended",attended);
   }
 
   classData.attendance.push({

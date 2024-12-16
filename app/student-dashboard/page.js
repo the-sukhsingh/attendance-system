@@ -33,42 +33,43 @@ export default function StudentDashboard() {
   if (!studentData) return <div>Loading...</div>;
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl mb-8">My Attendance</h1>
-      <div className="overflow-x-auto max-w-screen">
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-semibold mb-8 text-[var(--text-primary)]">My Attendance</h1>
+      <div className="table-container overflow-x-auto max-h-[70vh] overflow-y-auto">
         <table className="w-full">
-          <thead className="relative top-0">
+          <thead className="table-header bg-[var(--card-background)]">
             <tr>
-              <th className="text-left p-2 min-w-[120px] sticky left-0 z-10">Subject</th>
-              <th className="text-left p-2 min-w-[200px] absolute left-[200px] z-10">Dates</th>
-              <th className="text-left p-2 min-w-[150px] sticky right-0 z-10">Attendance %</th>
+              <th className="table-cell sticky left-0 z-10">Subject</th>
+              <th className="table-cell min-w-[200px]">Dates</th>
+              <th className="table-cell sticky right-0 z-10">Attendance %</th>
             </tr>
           </thead>
           <tbody>
             {classes && classes.map(cls => (
-              <tr key={cls._id}>
-                <td className="p-2 min-w-[120px] sticky text-black left-0 bg-white">{cls.name}</td>
-                <td className="p-2  overflow-x-auto  min-w-[200px]">
-                  <div className="flex gap-2 pb-2">
+              <tr key={cls._id} className="table-row">
+                <td className="table-cell sticky left-0 bg-[var(--card-background)]">{cls.name}</td>
+                <td className="table-cell">
+                  <div className="flex gap-2 pb-2 ">
                     {cls && cls.attendance.map((attendd, index) => (
-                      <div key={index} className="flex flex-col items-center min-w-[80px] border rounded p-1">
-                        <div className="text-sm">{new Date(attendd.date).toLocaleDateString()}</div>
-                        <div className="mt-1">
+                      <div key={index} className="card min-w-[80px] p-2">
+                        <div className="text-sm text-[var(--text-secondary)]">
+                          {new Date(attendd.date).toLocaleDateString()}
+                        </div>
+                        <div className="mt-1 flex justify-center">
                          {
-                          attendd.attended?.map((student) => {
-                            if (student.studentId === studentData._id) {
-                              return (
-                                <span key={student.studentId} className={`rounded-full h-4 w-4 inline-block ${student.present === true ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                              );
-                            }
-                          })
+                          attendd.attended?.find((student) => student.studentId === studentData._id) && (
+                            <span 
+                              key={studentData._id} 
+                              className={`rounded-full h-4 w-4 inline-block ${attendd.attended.find(student => student.studentId === studentData._id).present ? 'bg-green-500' : 'bg-red-500'}`}
+                            ></span>
+                          )
                          }
                         </div>
                       </div>
                     ))}
                   </div>
                 </td>
-                <td className="p-2 sticky right-0 text-black bg-white">
+                <td className="table-cell sticky right-0 bg-[var(--card-background)]">
                   {calculateStudentAttendance(studentData._id, cls.attendance)}%
                 </td>
               </tr>
