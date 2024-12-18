@@ -16,10 +16,11 @@ export async function GET(request) {
     if (!student) {
         return NextResponse.json({ message: "Student not found" }, { status: 404 });
     }
-    const classes = []
-    for(const classId of student.classes){
-        const cls = await Class.findById(classId);
-        classes.push(cls);
-    }
+
+    const allClasses = await Class.find();
+
+    const classes = allClasses.filter((classItem)=>{
+        return classItem.students.find((studentItem)=> studentItem.rollNo === student.rollNo)
+    })
     return NextResponse.json({classes}, { status: 200 });
 }

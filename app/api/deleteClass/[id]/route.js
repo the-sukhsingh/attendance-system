@@ -23,13 +23,9 @@ export async function DELETE(request,{params}) {
     if (cls.teacher.toString() !== teacherId) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    const students = await Student.find({ classes: classId });
+
     teacher.classes = teacher.classes.filter((cls) => cls.toString() !== classId);
     await teacher.save();
-    for (const student of students) {
-        student.classes = student.classes.filter((cls) => cls.toString() !== classId);
-        await student.save();
-    }
 
     await Class.findByIdAndDelete(classId);
     return NextResponse.json({ message: "Class deleted" }, { status: 200 });

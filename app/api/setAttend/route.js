@@ -11,7 +11,7 @@ export async function POST(request) {
   if (!user || user.role !== "teacher") {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
-  const { classId, presentArray,studentArray } = await request.json();
+  const { classId, presentArray,studentArray,date } = await request.json();
   const classData = await Class.findById(classId);
 
   if (!classData) {
@@ -19,22 +19,21 @@ export async function POST(request) {
   }
   const attended = []
   for(let i=0;i<studentArray.length;i++){
-    const student = await Student.findById(studentArray[i]._id);
-    if(!student){
-      return NextResponse.json({ message: "Student not found" }, { status: 404 });
-    }
-    const rollNo = student.rollNo;
+    const {name,rollNo} = studentArray[i];
     const isPresent = presentArray[rollNo] == 'present' ? true : false;
     attended.push({
-      studentId: studentArray[i]._id,
-      present: isPresent,
+     name,
+     rollNo,
+     present:isPresent
     });
   }
 
   classData.attendance.push({
-    date: new Date(),
+    date: date,
     attended,
   });
+
+  classData.attendance.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   await classData.save();
   return NextResponse.json({ class: classData });

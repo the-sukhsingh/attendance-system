@@ -12,8 +12,14 @@ const ClassSchema = new mongoose.Schema({
   },
   students: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Student",
+      name: {
+        type: String,
+        required: true,
+      },
+      rollNo: {
+        type: String,
+        required: true,
+      },
     },
   ],
   attendance: [
@@ -24,9 +30,12 @@ const ClassSchema = new mongoose.Schema({
       },
       attended: [
         {
-          studentId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Student",
+          name:{
+            type: String,
+            required: true
+          },
+          rollNo: {
+            type: String,
             required: true
           },
           present: {

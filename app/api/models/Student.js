@@ -23,10 +23,7 @@ const StudentSchema = new mongoose.Schema({
         type: String,
         default: "student",
     },
-    classes: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Class',
-    }],
+
 });
 
 const Student = mongoose.models.Student || mongoose.model('Student', StudentSchema);

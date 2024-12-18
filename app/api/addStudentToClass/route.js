@@ -13,22 +13,21 @@ export async function POST(request) {
         return NextResponse.json({ message: "Invalid User" });
     }
 
-    const { studentRoll, classId } = await request.json();
-    const student = await Student.findOne({ rollNo: studentRoll });
-    if (!student) {
-        return NextResponse.json({ error: "Student not found" });
-    }
-
+    const {studentName, studentRoll, classId } = await request.json();
     const classObj = await Class.findById(classId);
+
     if (!classObj) {
-        return NextResponse.json({ error: "Class not found" });
+        return NextResponse.json({ message: "Class not found" });
     }
 
-    classObj.students.push(student._id);
+
+    classObj.students.push({ name: studentName, rollNo: studentRoll });
+
+    classObj.students.sort((a, b) => a.rollNo - b.rollNo);
+
     await classObj.save();
 
-    student.classes.push(classId);
-    await student.save();
+    
     return NextResponse.json({ message: "Student added to class",
         status:201,
         class:classObj
