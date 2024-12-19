@@ -67,7 +67,7 @@ export default function ClassPage() {
 
   // Add state for new student dialog
   const [showAddStudentDialog, setShowAddStudentDialog] = useState(false);
-  const [newStudent, setNewStudent] = useState({name:"", rollNo: "" });
+  const [newStudent, setNewStudent] = useState({name:"", rollNo: "" ,allAbsent:false});
 
   const handleAddStudent = async () => {
     const res = await fetch(`/api/addStudentToClass`, {
@@ -78,6 +78,7 @@ export default function ClassPage() {
       body: JSON.stringify({
         studentName: newStudent.name,
         studentRoll: newStudent.rollNo,
+        allAbsent: newStudent.allAbsent,
         classId: id,
       }),
     });
@@ -170,11 +171,11 @@ export default function ClassPage() {
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+        <div className="mb-6 sm:mb-10">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-2">
             {classData.name}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
@@ -183,14 +184,14 @@ export default function ClassPage() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-6 mb-8">
+        <div className="flex flex-wrap gap-4 mb-6 sm:mb-8">
           <button
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium 
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium 
             transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-blue-500/50"
             onClick={() => setShowAttendanceDialog(true)}
           >
             <svg
-              className="w-5 h-5"
+              className="w-4 sm:w-5 h-4 sm:h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -202,16 +203,16 @@ export default function ClassPage() {
                 d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
               />
             </svg>
-            <span>Take Attendance</span>
+            <span className="hidden sm:inline">Take Attendance</span>
           </button>
 
           <button
-            className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-medium 
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-medium 
             transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-green-500/50"
             onClick={() => setShowAddStudentDialog(true)}
           >
             <svg
-              className="w-5 h-5"
+              className="w-4 sm:w-5 h-4 sm:h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -223,33 +224,27 @@ export default function ClassPage() {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            <span>Add Student</span>
+            <span className="hidden sm:inline">Add Student</span>
           </button>
 
-        
-
           <button
-            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-medium 
+            className="px-4 sm:px-6 py-2 sm:py-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-medium 
             transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-purple-500/50"
             onClick={downloadAttendanceReport}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 sm:w-5 h-4 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
                 d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span>Download Report</span>
+            <span className="hidden sm:inline">Download Report</span>
           </button>
-
         </div>
-
-
-
 
         {/* Main Content */}
         <div className="bg-gray-800 rounded-xl shadow-xl overflow-hidden">
           <div className="flex">
             {/* Student Info Table */}
-            <table className="border-r border-gray-200 dark:border-gray-700">
+            <table className="border-r border-gray-200 dark:border-gray-700 ">
               <thead>
                 <tr>
                   <th className="bg-gray-100 dark:bg-gray-900 text-left p-4 text-gray-600 dark:text-gray-400 font-medium">
@@ -315,8 +310,8 @@ export default function ClassPage() {
                             <span
                               className={`inline-flex items-center justify-center h-8 w-8 font-extrabold rounded-full ${
                                 att.attended[idx]?.present
-                                  ? "bg-green-300/80 dark:bg-green-500/20 text-green-800 dark:text-green-500"
-                                  : "bg-red-300/80 dark:bg-red-500/20 text-red-800 dark:text-red-500"
+                                  ? "bg-green-300/30 dark:bg-green-500/20 text-green-800 dark:text-green-500"
+                                  : "bg-red-300/30 dark:bg-red-500/20 text-red-800 dark:text-red-500"
                               }`}
                             >
                               {att.attended[idx]?.present ? "✓" : "✕"}
@@ -393,14 +388,13 @@ export default function ClassPage() {
           </div>
         </div>
 
-        {/* Dialogs */}
         {showAddStudentDialog && (
-          <div className="fixed inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center">
-            <div className="card p-6 w-96 max-w-[90vw]">
-              <h2 className="text-xl font-semibold mb-4">Add New Student</h2>
+          <div className="fixed inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="card p-4 sm:p-6 w-full max-w-md">
+              <h2 className="text-lg sm:text-xl font-semibold mb-4">Add New Student</h2>
 
               <input type="text"
-              className="input mb-4"
+              className="input mb-3 sm:mb-4 w-full"
               placeholder="Name"
               value={newStudent.name}
               onChange={(e) =>
@@ -409,22 +403,42 @@ export default function ClassPage() {
 
               <input
                 type="text"
-                className="input mb-4"
+                className="input mb-3 sm:mb-4 w-full"
                 placeholder="Roll Number"
                 value={newStudent.rollNo}
                 onChange={(e) =>
                   setNewStudent({ ...newStudent, rollNo: e.target.value })
                 }
               />
+
+
+                {
+                  classData.attendance.length > 0 && (
+                    <div className="flex items-center gap-2 mb-4">
+                      <input
+                        type="checkbox"
+                        id="allAbsent"
+                        checked={newStudent.allAbsent}
+                        onChange={(e) =>
+                          setNewStudent({ ...newStudent, allAbsent: e.target.checked })
+                        }
+                      />
+                      <label htmlFor="allAbsent" className="text-gray-600 dark:text-gray-400">
+                        Mark as Absent
+                      </label>
+                    </div>
+                  )
+                }
+
               <div className="flex justify-end gap-2">
                 <button
-                  className="btn-secondary"
+                  className="btn-secondary px-3 py-1 sm:px-4 sm:py-2"
                   onClick={() => setShowAddStudentDialog(false)}
                 >
                   Cancel
                 </button>
                 <button
-                  className="btn-primary"
+                  className="btn-primary px-3 py-1 sm:px-4 sm:py-2"
                   onClick={handleAddStudent}
                   disabled={
                     !newStudent.name ||
