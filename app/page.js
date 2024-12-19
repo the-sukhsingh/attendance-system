@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const [classes, setClasses] = useState([]);
   const [showAddClass, setShowAddClass] = useState(false);
-  const [newClass, setNewClass] = useState("");
+  const [newClass, setNewClass] = useState({
+    name:"",
+    classCode:""
+  });
   const router = useRouter();
   
   const getClasses = async () => {
@@ -122,9 +125,16 @@ export default function Home() {
               type="text"
               placeholder="Subject Name"
               className="w-full mb-4 p-2 border rounded"
-              value={newClass.subject}
-              onChange={(e) => setNewClass(e.target.value)}
+              value={newClass.name}
+              onChange={(e) => setNewClass({ ...newClass, name: e.target.value })}
               autoFocus
+            />
+            <input
+              type="text"
+              placeholder="Subject Code"
+              className="w-full mb-4 p-2 border rounded"
+              value={newClass.classCode}
+              onChange={(e) => setNewClass({ ...newClass, classCode: e.target.value })}
             />
             <div className="flex justify-end gap-2">
               <button

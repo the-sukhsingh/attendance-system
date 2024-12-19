@@ -10,6 +10,10 @@ const ClassSchema = new mongoose.Schema({
     ref: "Teacher",
     required: true
   },
+  classCode:{
+    type: String,
+    required: true
+  },
   students: [
     {
       name: {
